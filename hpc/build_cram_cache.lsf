@@ -1,0 +1,21 @@
+#!/usr/bin/env bash
+#BSUB -q short
+#BSUB -P re_gecip_cancer_sarcoma
+#BSUB -J ampsuite_cram_cache
+#BSUB -o logs/cram_cache.%J.out
+#BSUB -e logs/cram_cache.%J.err
+#BSUB -n 2
+#BSUB -R "rusage[mem=8000]"
+#BSUB -W 4:00
+#
+# One-off: build the htslib reference cache from the LOCAL reference FASTA so CRAMs decode offline.
+#   cd <restore dest> && mkdir -p logs
+#   bsub -env "all,FASTA=/path/to/GRCh38_reference.fasta" < hpc/build_cram_cache.lsf
+# Afterwards add to env_controlled.sh:  export REF_CACHE="<restore dest>/cram_ref_cache/%2s/%2s/%s"
+set -euo pipefail
+module load singularity/4.1.1
+AMPSUITE_ROOT="${AMPSUITE_ROOT:-$(pwd)}"
+# shellcheck disable=SC1091
+source "$AMPSUITE_ROOT/env_controlled.sh"
+: "${FASTA:?set FASTA to the reference the CRAMs were aligned to}"
+prepare_cram_cache.sh --fasta "$FASTA" --cache "$AMPSUITE_ROOT/cram_ref_cache" ${CRAM:+--cram "$CRAM"}
