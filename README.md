@@ -25,6 +25,8 @@ run_ampsuite.sh -s SAMPLE -t 16 --bam /path/sample.cram --ref GRCh38 --run_AA --
 ```
 `run_ampsuite.sh` detects the `.cram` suffix, mounts the cache read-only at `/home/cram_cache` and sets
 `REF_CACHE`/`REF_PATH` inside the container, so both samtools and CNVkit (pysam) decode from the cache.
+Validated offline (network namespace) on the GBM39 test data: results byte-identical to the BAM run; CRAM decoding makes
+the CNVkit and seed-filtering stages several times slower (15 min vs 4 min), so prefer BAMs when both exist.
 
 ## Fallback: convert CRAM to BAM
 ```bash
